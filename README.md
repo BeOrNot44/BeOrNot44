@@ -1,2 +1,2 @@
-# raghad
+# Raghad
 My personal repository.
