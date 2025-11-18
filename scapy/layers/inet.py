@@ -673,19 +673,21 @@ def in4_pseudoheader(proto, u, plen):
                        ln)
 
 
-def in4_chksum(proto, u, p):
-    # type: (int, IP, bytes) -> int
-    """IPv4 Pseudo Header checksum as defined in RFC793
-
-    :param proto: value of upper layer protocol
-    :param u: upper layer instance
-    :param p: the payload of the upper layer provided as a string
-    """
-    if not isinstance(u, IP):
-        warning("No IP underlayer to compute checksum. Leaving null.")
-        return 0
-    psdhdr = in4_pseudoheader(proto, u, len(p))
-    return checksum(psdhdr + p)
+# REMOVED: in4_chksum function
+# The function has been replaced with inline calls to in4_pseudoheader + checksum
+# def in4_chksum(proto, u, p):
+#     # type: (int, IP, bytes) -> int
+#     """IPv4 Pseudo Header checksum as defined in RFC793
+#
+#     :param proto: value of upper layer protocol
+#     :param u: upper layer instance
+#     :param p: the payload of the upper layer provided as a string
+#     """
+#     if not isinstance(u, IP):
+#         warning("No IP underlayer to compute checksum. Leaving null.")
+#         return 0
+#     psdhdr = in4_pseudoheader(proto, u, len(p))
+#     return checksum(psdhdr + p)
 
 
 def _is_ipv6_layer(p):
@@ -758,7 +760,8 @@ class TCP(Packet):
             p = p[:12] + chb(dataofs & 0xff) + p[13:]
         if self.chksum is None:
             if isinstance(self.underlayer, IP):
-                ck = in4_chksum(socket.IPPROTO_TCP, self.underlayer, p)
+                psdhdr = in4_pseudoheader(socket.IPPROTO_TCP, self.underlayer, len(p))
+                ck = checksum(psdhdr + p)
                 p = p[:16] + struct.pack("!H", ck) + p[18:]
             elif conf.ipv6_enabled and isinstance(self.underlayer, scapy.layers.inet6.IPv6) or isinstance(self.underlayer, scapy.layers.inet6._IPv6ExtHdr):  # noqa: E501
                 ck = scapy.layers.inet6.in6_chksum(socket.IPPROTO_TCP, self.underlayer, p)  # noqa: E501
@@ -830,7 +833,8 @@ class UDP(Packet):
             p = p[:4] + struct.pack("!H", tmp_len) + p[6:]
         if self.chksum is None:
             if isinstance(self.underlayer, IP):
-                ck = in4_chksum(socket.IPPROTO_UDP, self.underlayer, p)
+                psdhdr = in4_pseudoheader(socket.IPPROTO_UDP, self.underlayer, len(p))
+                ck = checksum(psdhdr + p)
                 # According to RFC768 if the result checksum is 0, it should be set to 0xFFFF  # noqa: E501
                 if ck == 0:
                     ck = 0xFFFF
