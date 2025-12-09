@@ -1,12 +1,5 @@
 # Hi there, I'm Raghad Aljadayah 👋
 
-## About Me
-
-I'm a passionate .NET & Angular Developer who loves coding and building software solutions. Currently, I'm focused on enhancing my skills in ASP.NET Core and Angular.
-
-- 🔭 I’m currently working on ASP.NET Core projects.
-- 🌱 I’m currently working on Angular projects.
-
 ## Connect with Me
 
 Feel free to reach out to me:
